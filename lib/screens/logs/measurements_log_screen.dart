@@ -112,15 +112,8 @@ class _MeasurementsLogScreenState extends BaseLogScreenState<MeasurementsLogScre
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Weight is required';
-                  final weight = double.tryParse(value!);
-                  if (weight == null || weight <= 0) {
-                    return 'Enter a valid weight';
-                  }
-                  return null;
-                },
-                onSaved: (value) => weight = double.parse(value!),
+                validator: (value) => null,
+                onSaved: (value) => weight = double.tryParse(value ?? '') ?? 0,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -247,15 +240,8 @@ class _MeasurementsLogScreenState extends BaseLogScreenState<MeasurementsLogScre
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Weight is required';
-                  final weight = double.tryParse(value!);
-                  if (weight == null || weight <= 0) {
-                    return 'Enter a valid weight';
-                  }
-                  return null;
-                },
-                onSaved: (value) => weight = double.parse(value!),
+                validator: (value) => null,
+                onSaved: (value) => weight = double.tryParse(value ?? '') ?? 0,
               ),
               const SizedBox(height: 16),
               TextFormField(
