@@ -231,4 +231,127 @@ class PetService {
       rethrow; // Re-throw the error for handling in the UI
     }
   }
+
+  // Update a food log
+  Future<void> updateFoodLog(FoodLog foodLog) async {
+    if (foodLog.id == null) throw Exception('Food log ID is required for update');
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(foodLog.petId)
+          .collection('food')
+          .doc(foodLog.id)
+          .update(foodLog.toMap());
+      developer.log('Food log updated successfully: ${foodLog.id}');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error updating food log: ${foodLog.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
+
+  // Delete a food log
+  Future<void> deleteFoodLog(String petId, String foodLogId) async {
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(petId)
+          .collection('food')
+          .doc(foodLogId)
+          .delete();
+      developer.log('Food log deleted successfully: $foodLogId');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error deleting food log: $foodLogId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
+
+  // Update a health log
+  Future<void> updateHealthLog(HealthLog healthLog) async {
+    if (healthLog.id == null) throw Exception('Health log ID is required for update');
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(healthLog.petId)
+          .collection('healthLogs')
+          .doc(healthLog.id)
+          .update(healthLog.toMap());
+      developer.log('Health log updated successfully: ${healthLog.id}');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error updating health log: ${healthLog.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
+
+  // Delete a health log
+  Future<void> deleteHealthLog(String petId, String healthLogId) async {
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(petId)
+          .collection('healthLogs')
+          .doc(healthLogId)
+          .delete();
+      developer.log('Health log deleted successfully: $healthLogId');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error deleting health log: $healthLogId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
+
+  // Update a measurement log
+  Future<void> updateMeasurementLog(MeasurementLog measurementLog) async {
+    if (measurementLog.id == null) throw Exception('Measurement log ID is required for update');
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(measurementLog.petId)
+          .collection('measurements')
+          .doc(measurementLog.id)
+          .update(measurementLog.toMap());
+      developer.log('Measurement log updated successfully: ${measurementLog.id}');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error updating measurement log: ${measurementLog.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
+
+  // Delete a measurement log
+  Future<void> deleteMeasurementLog(String petId, String measurementLogId) async {
+    try {
+      await _firestore
+          .collection('pets')
+          .doc(petId)
+          .collection('measurements')
+          .doc(measurementLogId)
+          .delete();
+      developer.log('Measurement log deleted successfully: $measurementLogId');
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error deleting measurement log: $measurementLogId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw the error for handling in the UI
+    }
+  }
 } 
