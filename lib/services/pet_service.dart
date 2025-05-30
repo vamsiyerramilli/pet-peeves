@@ -55,4 +55,15 @@ class PetService {
       'hasPets': hasPets,
     });
   }
+
+  // Fetch all pets for a user as a Future (one-time fetch)
+  Future<List<Pet>> fetchPetsForUser(String userId) async {
+    final snapshot = await _firestore
+        .collection('pets')
+        .where('ownerId', isEqualTo: userId)
+        .get();
+    return snapshot.docs
+        .map((doc) => Pet.fromMap(doc.id, doc.data()))
+        .toList();
+  }
 } 

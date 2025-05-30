@@ -31,7 +31,27 @@ class _SplashScreenState extends State<SplashScreen> {
       final userId = authProvider.user?.uid;
       final petService = PetService();
       if (hasPets) {
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        // Fetch pets from Firestore
+        if (userId != null) {
+          try {
+            final pets = await petService.fetchPetsForUser(userId);
+            if (!mounted) return;
+            Navigator.pushReplacementNamed(
+              context,
+              AppRouter.dashboard,
+              arguments: {'pets': pets},
+            );
+          } catch (e) {
+            if (!mounted) return;
+            // Show error and fallback to login
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error loading pets: $e')),
+            );
+            Navigator.pushReplacementNamed(context, AppRouter.login);
+          }
+        } else {
+          Navigator.pushReplacementNamed(context, AppRouter.login);
+        }
       } else {
         Navigator.pushReplacementNamed(
           context,
