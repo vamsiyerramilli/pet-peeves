@@ -14,10 +14,10 @@ abstract class BaseLogScreen extends StatefulWidget {
   });
 
   @override
-  State<BaseLogScreen> createState() => _BaseLogScreenState();
+  State<BaseLogScreen> createState();
 }
 
-class _BaseLogScreenState<T extends BaseLogScreen> extends State<T> {
+abstract class BaseLogScreenState<T extends BaseLogScreen> extends State<T> {
   bool _isLoading = false;
 
   @override
@@ -28,7 +28,7 @@ class _BaseLogScreenState<T extends BaseLogScreen> extends State<T> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _showAddEntryDialog(context),
+            onPressed: () => showAddEntryDialog(context),
           ),
         ],
       ),
@@ -66,7 +66,7 @@ class _BaseLogScreenState<T extends BaseLogScreen> extends State<T> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => _showAddEntryDialog(context),
+                  onPressed: () => showAddEntryDialog(context),
                   icon: const Icon(Icons.add),
                   label: const Text('Add Entry'),
                 ),
@@ -88,5 +88,5 @@ class _BaseLogScreenState<T extends BaseLogScreen> extends State<T> {
 
   Stream getLogStream();
   Widget buildLogItem(dynamic log);
-  Future<void> _showAddEntryDialog(BuildContext context);
+  Future<void> showAddEntryDialog(BuildContext context);
 } 

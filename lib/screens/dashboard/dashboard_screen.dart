@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:pet_peeves/models/pet.dart';
 import 'package:pet_peeves/widgets/dashboard/dashboard_cards.dart';
 import 'package:pet_peeves/widgets/pet_selector.dart';
+import 'package:pet_peeves/services/pet_service.dart';
+import 'package:pet_peeves/widgets/logs/add_log_bottom_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
   final List<Pet> pets;
   final Function(Pet) onPetSelected;
+  final PetService petService;
 
   const DashboardScreen({
     super.key,
     required this.pets,
     required this.onPetSelected,
+    required this.petService,
   });
 
   @override
@@ -19,11 +23,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late Pet _selectedPet;
+  late PetService _petService;
 
   @override
   void initState() {
     super.initState();
     _selectedPet = widget.pets.first;
+    _petService = widget.petService;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onPetSelected(_selectedPet);
     });
@@ -37,15 +43,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _onAddFoodLog() {
-    // TODO: Implement food log addition
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddLogBottomSheet(
+        pet: _selectedPet,
+        petService: _petService,
+      ),
+    );
   }
 
   void _onAddMeasurement() {
-    // TODO: Implement measurement addition
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddLogBottomSheet(
+        pet: _selectedPet,
+        petService: _petService,
+      ),
+    );
   }
 
   void _onAddVaccination() {
-    // TODO: Implement vaccination addition
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddLogBottomSheet(
+        pet: _selectedPet,
+        petService: _petService,
+      ),
+    );
   }
 
   void _onViewHealthHistory() {

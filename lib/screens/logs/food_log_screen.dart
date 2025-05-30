@@ -3,6 +3,7 @@ import 'package:pet_peeves/models/pet.dart';
 import 'package:pet_peeves/screens/logs/base_log_screen.dart';
 import 'package:pet_peeves/services/pet_service.dart';
 import 'package:intl/intl.dart';
+import 'package:pet_peeves/models/logs.dart';
 
 class FoodLogScreen extends BaseLogScreen {
   final PetService petService;
@@ -20,7 +21,7 @@ class FoodLogScreen extends BaseLogScreen {
   State<FoodLogScreen> createState() => _FoodLogScreenState();
 }
 
-class _FoodLogScreenState extends State<FoodLogScreen> {
+class _FoodLogScreenState extends BaseLogScreenState<FoodLogScreen> {
   @override
   Stream getLogStream() {
     return widget.petService.getFoodLogs(widget.pet.id);
@@ -28,26 +29,29 @@ class _FoodLogScreenState extends State<FoodLogScreen> {
 
   @override
   Widget buildLogItem(dynamic log) {
+    final foodLog = log as FoodLog;
     return Card(
       child: ListTile(
         leading: const Icon(Icons.restaurant),
-        title: Text(log.foodName),
+        title: Text(foodLog.foodName),
         subtitle: Text(
-          '${log.amount}g • ${log.energyPerGram * log.amount} kcal',
+          '${foodLog.amount}g • ${foodLog.energyContent! * foodLog.amount} kcal',
         ),
         trailing: Text(
-          DateFormat('MMM d, h:mm a').format(log.timestamp),
+          DateFormat('MMM d, h:mm a').format(foodLog.timestamp),
         ),
       ),
     );
   }
 
   @override
-  Future<void> _showAddEntryDialog(BuildContext context) async {
+  Future<void> showAddEntryDialog(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     String foodName = '';
     double amount = 0;
     double energyPerGram = 0;
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
 
     await showDialog(
       context: context,
@@ -101,6 +105,41 @@ class _FoodLogScreenState extends State<FoodLogScreen> {
                 },
                 onSaved: (value) => energyPerGram = double.parse(value!),
               ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Date'),
+                subtitle: Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
+                  }
+                },
+              ),
+              ListTile(
+                title: const Text('Time'),
+                subtitle: Text(selectedTime.format(context)),
+                trailing: const Icon(Icons.access_time),
+                onTap: () async {
+                  final pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime,
+                  );
+                  if (pickedTime != null) {
+                    setState(() {
+                      selectedTime = pickedTime;
+                    });
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -114,11 +153,15 @@ class _FoodLogScreenState extends State<FoodLogScreen> {
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
                 try {
+                  if (widget.pet.id == null) {
+                    throw Exception('Pet ID is required to add a food log');
+                  }
                   await widget.petService.addFoodLog(
-                    widget.pet.id,
-                    foodName,
-                    amount,
-                    energyPerGram,
+                    petId: widget.pet.id!,
+                    foodName: foodName,
+                    amount: amount,
+                    energyPerGram: energyPerGram,
+                    timestamp: DateTime(selectedDate.year, selectedDate.month, selectedDate.day, selectedTime.hour, selectedTime.minute),
                   );
                   if (mounted) Navigator.pop(context);
                 } catch (e) {
