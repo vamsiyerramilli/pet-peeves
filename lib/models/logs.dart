@@ -4,17 +4,18 @@ enum LogType {
   food,
   health,
   vaccine,
+  measurement,
 }
 
 class BaseLog {
-  final String id;
+  final String? id;
   final String petId;
   final DateTime timestamp;
   final String notes;
   final LogType type;
 
   const BaseLog({
-    required this.id,
+    this.id,
     required this.petId,
     required this.timestamp,
     required this.notes,
@@ -79,6 +80,7 @@ class HealthLog extends BaseLog {
   final List<String> symptoms;
   final String? diagnosis;
   final String? treatment;
+  final DateTime? nextDueDate;
 
   const HealthLog({
     required super.id,
@@ -90,6 +92,7 @@ class HealthLog extends BaseLog {
     required this.symptoms,
     this.diagnosis,
     this.treatment,
+    this.nextDueDate,
   }) : super(type: LogType.health);
 
   @override
@@ -101,6 +104,7 @@ class HealthLog extends BaseLog {
       'symptoms': symptoms,
       'diagnosis': diagnosis,
       'treatment': treatment,
+      'nextDueDate': nextDueDate != null ? Timestamp.fromDate(nextDueDate!) : null,
     };
   }
 
@@ -115,6 +119,7 @@ class HealthLog extends BaseLog {
       symptoms: List<String>.from(map['symptoms'] as List),
       diagnosis: map['diagnosis'] as String?,
       treatment: map['treatment'] as String?,
+      nextDueDate: (map['nextDueDate'] as Timestamp?)?.toDate(),
     );
   }
 }
@@ -157,6 +162,44 @@ class VaccineLog extends BaseLog {
       administeredBy: map['administeredBy'] as String,
       nextDueDate: (map['nextDueDate'] as Timestamp).toDate(),
       batchNumber: map['batchNumber'] as String?,
+    );
+  }
+}
+
+class MeasurementLog extends BaseLog {
+  final double weight;
+  final double height;
+  final double length;
+
+  const MeasurementLog({
+    required super.id,
+    required super.petId,
+    required super.timestamp,
+    required super.notes,
+    required this.weight,
+    required this.height,
+    required this.length,
+  }) : super(type: LogType.measurement);
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      ...super.toMap(),
+      'weight': weight,
+      'height': height,
+      'length': length,
+    };
+  }
+
+  factory MeasurementLog.fromMap(String id, Map<String, dynamic> map) {
+    return MeasurementLog(
+      id: id,
+      petId: map['petId'] as String,
+      timestamp: (map['timestamp'] as Timestamp).toDate(),
+      notes: map['notes'] as String,
+      weight: (map['weight'] as num).toDouble(),
+      height: (map['height'] as num).toDouble(),
+      length: (map['length'] as num).toDouble(),
     );
   }
 } 

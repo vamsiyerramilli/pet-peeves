@@ -42,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
                 _selectedPet = pet;
               });
             },
+            petService: widget.petService,
           ),
           const Center(child: Text('Logs Screen - Coming Soon')),
           PetProfileScreen(

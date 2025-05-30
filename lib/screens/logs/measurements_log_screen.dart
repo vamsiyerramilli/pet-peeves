@@ -3,6 +3,7 @@ import 'package:pet_peeves/models/pet.dart';
 import 'package:pet_peeves/screens/logs/base_log_screen.dart';
 import 'package:pet_peeves/services/pet_service.dart';
 import 'package:intl/intl.dart';
+import 'package:pet_peeves/models/logs.dart';
 
 class MeasurementsLogScreen extends BaseLogScreen {
   final PetService petService;
@@ -20,7 +21,7 @@ class MeasurementsLogScreen extends BaseLogScreen {
   State<MeasurementsLogScreen> createState() => _MeasurementsLogScreenState();
 }
 
-class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
+class _MeasurementsLogScreenState extends BaseLogScreenState<MeasurementsLogScreen> {
   @override
   Stream getLogStream() {
     return widget.petService.getMeasurementLogs(widget.pet.id);
@@ -28,6 +29,7 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
 
   @override
   Widget buildLogItem(dynamic log) {
+    final measurementLog = log as MeasurementLog;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,19 +40,19 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  DateFormat('MMM d, y').format(log.timestamp),
+                  DateFormat('MMM d, y').format(measurementLog.timestamp),
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
-                  DateFormat('h:mm a').format(log.timestamp),
+                  DateFormat('h:mm a').format(measurementLog.timestamp),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildMeasurementRow('Weight', '${log.weight} kg', Icons.monitor_weight),
-            _buildMeasurementRow('Height', '${log.height} cm', Icons.height),
-            _buildMeasurementRow('Length', '${log.length} cm', Icons.straighten),
+            _buildMeasurementRow('Weight', '${measurementLog.weight} kg', Icons.monitor_weight),
+            _buildMeasurementRow('Height', '${measurementLog.height} cm', Icons.height),
+            _buildMeasurementRow('Length', '${measurementLog.length} cm', Icons.straighten),
           ],
         ),
       ),
@@ -83,11 +85,13 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
   }
 
   @override
-  Future<void> _showAddEntryDialog(BuildContext context) async {
+  Future<void> showAddEntryDialog(BuildContext context) async {
     final formKey = GlobalKey<FormState>();
     double weight = 0;
     double height = 0;
     double length = 0;
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay.now();
 
     await showDialog(
       context: context,
@@ -121,15 +125,8 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Height is required';
-                  final height = double.tryParse(value!);
-                  if (height == null || height <= 0) {
-                    return 'Enter a valid height';
-                  }
-                  return null;
-                },
-                onSaved: (value) => height = double.parse(value!),
+                validator: (value) => null,
+                onSaved: (value) => height = double.tryParse(value ?? '') ?? 0,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -138,15 +135,43 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Length is required';
-                  final length = double.tryParse(value!);
-                  if (length == null || length <= 0) {
-                    return 'Enter a valid length';
+                validator: (value) => null,
+                onSaved: (value) => length = double.tryParse(value ?? '') ?? 0,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Date'),
+                subtitle: Text(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      selectedDate = pickedDate;
+                    });
                   }
-                  return null;
                 },
-                onSaved: (value) => length = double.parse(value!),
+              ),
+              ListTile(
+                title: const Text('Time'),
+                subtitle: Text(selectedTime.format(context)),
+                trailing: const Icon(Icons.access_time),
+                onTap: () async {
+                  final pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime,
+                  );
+                  if (pickedTime != null) {
+                    setState(() {
+                      selectedTime = pickedTime;
+                    });
+                  }
+                },
               ),
             ],
           ),
@@ -160,12 +185,22 @@ class _MeasurementsLogScreenState extends State<MeasurementsLogScreen> {
             onPressed: () async {
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
+                if (weight <= 0 && height <= 0 && length <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter at least one measurement (weight, height, or length).')),
+                  );
+                  return;
+                }
                 try {
+                  if (widget.pet.id == null) {
+                    throw Exception('Pet ID is required to add measurements');
+                  }
                   await widget.petService.addMeasurementLog(
-                    widget.pet.id,
-                    weight,
-                    height,
-                    length,
+                    petId: widget.pet.id!,
+                    weight: weight,
+                    height: height,
+                    length: length,
+                    timestamp: DateTime(selectedDate.year, selectedDate.month, selectedDate.day, selectedTime.hour, selectedTime.minute),
                   );
                   if (mounted) Navigator.pop(context);
                 } catch (e) {
