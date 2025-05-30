@@ -220,12 +220,23 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             _buildInfoRow(
               'Species',
               _isEditing
-                  ? TextFormField(
-                      controller: _speciesController,
+                  ? DropdownButtonFormField<String>(
+                      value: _speciesController.text,
                       decoration: const InputDecoration(
                         labelText: 'Species',
                         border: OutlineInputBorder(),
                       ),
+                      items: ['Dog', 'Cat', 'Bird', 'Other'] // Assuming these are the species options
+                          .map((species) => DropdownMenuItem(
+                                value: species,
+                                child: Text(species),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          _speciesController.text = value; // Update controller text
+                        }
+                      },
                       validator: (value) =>
                           value?.isEmpty ?? true ? 'Species is required' : null,
                     )
@@ -267,6 +278,10 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                         _dateOfBirth != null
                             ? DateFormat('MMM d, y').format(_dateOfBirth!)
                             : 'Not set',
+                      ),
+                      // Ensure TextButton is enabled
+                      style: TextButton.styleFrom(
+                        foregroundColor: _isEditing ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface,
                       ),
                     )
                   : Text(
