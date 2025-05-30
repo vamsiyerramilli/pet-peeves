@@ -14,10 +14,10 @@ class PetForm extends StatefulWidget {
   });
 
   @override
-  State<PetForm> createState() => _PetFormState();
+  State<PetForm> createState() => PetFormState();
 }
 
-class _PetFormState extends State<PetForm> {
+class PetFormState extends State<PetForm> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   String _selectedSpecies = 'Dog';
@@ -44,43 +44,66 @@ class _PetFormState extends State<PetForm> {
   }
 
   void _submitForm() {
-    if (!_formKey.currentState!.validate()) return;
-
-    final userId = context.read<AuthProvider>().user?.uid;
-    if (userId == null) return;
-
-    PetMeasurements? measurements;
-    if (_showOptionalFields && _weightController.text.isNotEmpty && _heightController.text.isNotEmpty && _lengthController.text.isNotEmpty) {
-      final weight = double.tryParse(_weightController.text);
-      final height = double.tryParse(_heightController.text);
-      final length = double.tryParse(_lengthController.text);
-      if (weight != null && height != null && length != null) {
-        measurements = PetMeasurements(
-          weight: weight,
-          height: height,
-          length: length,
-        );
-      }
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
     }
 
-    final pet = Pet(
-      name: _nameController.text,
-      species: _selectedSpecies,
-      dateOfBirth: _dateOfBirth,
-      gender: _selectedGender,
-      adoptionDate: _adoptionDate,
-      photoURL: _photoURL,
-      measurements: measurements,
-      foods: _showOptionalFields ? _foods : null,
-      vaccinations: _showOptionalFields ? _vaccinations : null,
-      ownerId: userId,
-    );
+    // Validate date of birth separately since it's not a TextFormField
+    if (_dateOfBirth == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a date of birth')),
+      );
+      return;
+    }
 
-    widget.onSave(pet);
-    _resetForm();
+    final userId = context.read<AuthProvider>().user?.uid;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
+    try {
+      PetMeasurements? measurements;
+      if (_showOptionalFields && _weightController.text.isNotEmpty && _heightController.text.isNotEmpty && _lengthController.text.isNotEmpty) {
+        final weight = double.tryParse(_weightController.text);
+        final height = double.tryParse(_heightController.text);
+        final length = double.tryParse(_lengthController.text);
+        if (weight != null && height != null && length != null) {
+          measurements = PetMeasurements(
+            weight: weight,
+            height: height,
+            length: length,
+          );
+        }
+      }
+
+      final pet = Pet(
+        name: _nameController.text,
+        species: _selectedSpecies,
+        dateOfBirth: _dateOfBirth,
+        gender: _selectedGender,
+        adoptionDate: _adoptionDate,
+        photoURL: _photoURL,
+        measurements: measurements,
+        foods: _showOptionalFields ? _foods : null,
+        vaccinations: _showOptionalFields ? _vaccinations : null,
+        ownerId: userId,
+      );
+
+      widget.onSave(pet);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error creating pet: $e')),
+      );
+    }
   }
 
-  void _resetForm() {
+  void resetForm() {
     _formKey.currentState?.reset();
     _nameController.clear();
     _weightController.clear();
@@ -94,6 +117,7 @@ class _PetFormState extends State<PetForm> {
       _photoURL = null;
       _foods.clear();
       _vaccinations.clear();
+      _showOptionalFields = false;
     });
   }
 

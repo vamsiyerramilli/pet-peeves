@@ -1,13 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_peeves/models/pet.dart';
+import 'dart:developer' as developer;
 
 class PetService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Add a new pet
   Future<String> addPet(Pet pet) async {
-    final docRef = await _firestore.collection('pets').add(pet.toMap());
-    return docRef.id;
+    try {
+      developer.log('Attempting to save pet: ${pet.name}');
+      final petMap = pet.toMap();
+      developer.log('Pet data to save: $petMap');
+      
+      final docRef = await _firestore.collection('pets').add(petMap);
+      developer.log('Pet saved successfully with ID: ${docRef.id}');
+      return docRef.id;
+    } catch (e, stackTrace) {
+      developer.log(
+        'Error saving pet: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;  // Re-throw the error so it can be caught by the UI
+    }
   }
 
   // Get all pets for a user
