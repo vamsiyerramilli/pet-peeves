@@ -44,20 +44,21 @@ class AppRouter {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case dashboard:
-        // Extract pets from arguments if provided
+        // Extract pets and petService from arguments if provided
         final args = settings.arguments as Map<String, dynamic>?;
         final pets = args?['pets'] as List<Pet>?;
-        if (pets == null) {
+        final petService = args?['petService'] as PetService?;
+        if (pets == null || petService == null) {
           return MaterialPageRoute(
             builder: (_) => Scaffold(
               body: Center(
-                child: Text('Pets data is required for dashboard'),
+                child: Text('Pets data and PetService are required for dashboard'),
               ),
             ),
           );
         }
         return MaterialPageRoute(
-          builder: (_) => MainScreen(pets: pets),
+          builder: (_) => MainScreen(pets: pets, petService: petService),
         );
       case petProfile:
         // Extract pet and petService from arguments if provided

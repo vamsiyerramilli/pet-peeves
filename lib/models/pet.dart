@@ -13,6 +13,7 @@ class Pet {
   final List<PetVaccination>? vaccinations;
   final String ownerId;
   final DateTime createdAt;
+  final bool isArchived;
 
   Pet({
     this.id,
@@ -27,6 +28,7 @@ class Pet {
     this.vaccinations,
     required this.ownerId,
     DateTime? createdAt,
+    this.isArchived = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -42,6 +44,7 @@ class Pet {
       'vaccinations': vaccinations?.map((v) => v.toMap()).toList(),
       'ownerId': ownerId,
       'createdAt': Timestamp.fromDate(createdAt),
+      'isArchived': isArchived,
     };
   }
 
@@ -65,6 +68,7 @@ class Pet {
           .toList(),
       ownerId: map['ownerId'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
+      isArchived: map['isArchived'] ?? false,
     );
   }
 
@@ -78,6 +82,7 @@ class Pet {
     PetMeasurements? measurements,
     List<PetFood>? foods,
     List<PetVaccination>? vaccinations,
+    bool? isArchived,
   }) {
     return Pet(
       id: id,
@@ -92,6 +97,7 @@ class Pet {
       vaccinations: vaccinations ?? this.vaccinations,
       ownerId: ownerId,
       createdAt: createdAt,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 }

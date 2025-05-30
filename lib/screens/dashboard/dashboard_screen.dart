@@ -5,10 +5,12 @@ import 'package:pet_peeves/widgets/pet_selector.dart';
 
 class DashboardScreen extends StatefulWidget {
   final List<Pet> pets;
+  final Function(Pet) onPetSelected;
 
   const DashboardScreen({
     super.key,
     required this.pets,
+    required this.onPetSelected,
   });
 
   @override
@@ -22,12 +24,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _selectedPet = widget.pets.first;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onPetSelected(_selectedPet);
+    });
   }
 
   void _onPetSelected(Pet pet) {
     setState(() {
       _selectedPet = pet;
     });
+    widget.onPetSelected(pet);
   }
 
   void _onAddFoodLog() {
