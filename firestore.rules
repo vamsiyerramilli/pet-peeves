@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // User settings subcollection
+      match /settings/{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // User's pets subcollection
+      match /pets/{petId} {
+        allow read, write: if isOwner(userId);
+        
+        // Pet's logs subcollection
+        match /logs/{logId} {
+          allow read, write: if isOwner(userId);
+        }
+        
+        // Pet's food entries subcollection
+        match /food/{foodId} {
+          allow read, write: if isOwner(userId);
+        }
+        
+        // Pet's measurements subcollection
+        match /measurements/{measurementId} {
+          allow read, write: if isOwner(userId);
+        }
+        
+        // Pet's vaccinations subcollection
+        match /vaccinations/{vaccinationId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
+    }
+
+    // Global food database (read-only for authenticated users)
+    match /food_database/{foodId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admin can write through backend
+    }
+  }
+} 

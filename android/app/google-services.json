@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "316973893429",
+    "project_id": "pet-peeves-ys",
+    "storage_bucket": "pet-peeves-ys.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316973893429:android:dc80a9ef92e1b964c6ee7c",
+        "android_client_info": {
+          "package_name": "com.example.pet_peeves"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtHpU_v5hM6hgK13htTnzDq9RAS2coTkA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
