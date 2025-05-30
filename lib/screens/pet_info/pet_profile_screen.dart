@@ -28,10 +28,19 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   late List<PetFood> _foods;
   late PetMeasurements? _measurements;
 
+  // Add controllers for measurements
+  late TextEditingController _weightController;
+  late TextEditingController _heightController;
+  late TextEditingController _lengthController;
+
   @override
   void initState() {
     super.initState();
     _initializeControllers();
+    // Initialize measurement controllers here
+    _weightController = TextEditingController(text: _measurements?.weight?.toString() ?? '');
+    _heightController = TextEditingController(text: _measurements?.height?.toString() ?? '');
+    _lengthController = TextEditingController(text: _measurements?.length?.toString() ?? '');
   }
 
   void _initializeControllers() {
@@ -48,11 +57,25 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _speciesController.dispose();
+    // Dispose measurement controllers
+    _weightController.dispose();
+    _heightController.dispose();
+    _lengthController.dispose();
     super.dispose();
   }
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Parse measurement values from controllers
+    final double? weight = double.tryParse(_weightController.text);
+    final double? height = double.tryParse(_heightController.text);
+    final double? length = double.tryParse(_lengthController.text);
+
+    // Create updated measurements object
+    final PetMeasurements? updatedMeasurements = (weight != null && height != null && length != null)
+        ? PetMeasurements(weight: weight, height: height, length: length)
+        : null; // Set to null if any field is empty or invalid
 
     try {
       final updatedPet = widget.pet.copyWith(
@@ -61,12 +84,15 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         dateOfBirth: _dateOfBirth,
         gender: _gender,
         adoptionDate: _adoptionDate,
-        foods: _foods,
-        measurements: _measurements,
+        foods: _foods, // Keep existing foods for now
+        measurements: updatedMeasurements, // Use the updated measurements
       );
 
       await widget.petService.updatePet(updatedPet);
-      setState(() => _isEditing = false);
+      setState(() {
+        _isEditing = false;
+        _measurements = updatedMeasurements; // Update local state after saving
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
@@ -96,6 +122,28 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             IconButton(
               icon: const Icon(Icons.save),
               onPressed: _saveChanges,
+            ),
+          if (!_isEditing) // Show these options only when not editing
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'archive') {
+                  _archivePet();
+                } else if (value == 'delete') {
+                  _deletePet();
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'archive',
+                    child: Text('Archive Pet'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Text('Delete Pet'),
+                  ),
+                ];
+              },
             ),
         ],
       ),
@@ -267,38 +315,62 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Health Metrics',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                if (_isEditing)
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      // TODO: Implement add measurements
-                    },
-                  ),
-              ],
+            Text(
+              'Measurements',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
-            if (widget.pet.measurements != null) ...[
-              _buildInfoRow(
-                'Weight',
-                Text('${widget.pet.measurements!.weight} kg'),
-              ),
-              _buildInfoRow(
-                'Height',
-                Text('${widget.pet.measurements!.height} cm'),
-              ),
-              _buildInfoRow(
-                'Length',
-                Text('${widget.pet.measurements!.length} cm'),
-              ),
-            ] else
-              const Text('No measurements recorded'),
+            // Weight
+            _buildInfoRow(
+              'Weight (kg)',
+              _isEditing
+                  ? TextFormField(
+                      controller: _weightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Weight'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return null;
+                        if (double.tryParse(value) == null) return 'Enter a valid number';
+                        if (double.parse(value) < 0) return 'Enter a positive number';
+                        return null;
+                      },
+                    )
+                  : Text(_measurements?.weight?.toString() ?? 'Not set'),
+            ),
+            // Height
+            _buildInfoRow(
+              'Height (cm)',
+              _isEditing
+                  ? TextFormField(
+                      controller: _heightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Height'),
+                       validator: (value) {
+                        if (value == null || value.isEmpty) return null;
+                        if (double.tryParse(value) == null) return 'Enter a valid number';
+                        if (double.parse(value) < 0) return 'Enter a positive number';
+                        return null;
+                      },
+                    )
+                  : Text(_measurements?.height?.toString() ?? 'Not set'),
+            ),
+            // Length
+            _buildInfoRow(
+              'Length (cm)',
+              _isEditing
+                  ? TextFormField(
+                      controller: _lengthController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Length'),
+                       validator: (value) {
+                        if (value == null || value.isEmpty) return null;
+                        if (double.tryParse(value) == null) return 'Enter a valid number';
+                        if (double.parse(value) < 0) return 'Enter a positive number';
+                        return null;
+                      },
+                    )
+                  : Text(_measurements?.length?.toString() ?? 'Not set'),
+            ),
           ],
         ),
       ),
@@ -306,40 +378,7 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
   }
 
   Widget _buildFoodDetails() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Food Details',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                if (_isEditing)
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      // TODO: Implement add food
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (widget.pet.foods?.isNotEmpty ?? false)
-              ...widget.pet.foods!.map((food) => _buildInfoRow(
-                    food.name,
-                    Text('${food.energyPerGram} kcal/g'),
-                  ))
-            else
-              const Text('No food preferences recorded'),
-          ],
-        ),
-      ),
-    );
+    return const SizedBox.shrink(); // Hide this section for now
   }
 
   Widget _buildInfoRow(String label, Widget value) {
@@ -359,5 +398,85 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _archivePet() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Archive Pet'),
+        content: Text('Are you sure you want to archive ${widget.pet.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // Don't archive
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // Archive
+            child: const Text('Archive'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        // Update the pet's status to archived
+        final archivedPet = widget.pet.copyWith(isArchived: true);
+        await widget.petService.updatePet(archivedPet);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${widget.pet.name} archived')),
+          );
+          // Navigate back after archiving
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error archiving pet: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _deletePet() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Pet'),
+        content: Text('Are you sure you want to permanently delete ${widget.pet.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // Don't delete
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true), // Delete
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await widget.petService.deletePet(widget.pet.id!); // Assuming id is not null for existing pets
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${widget.pet.name} deleted')),
+          );
+          // Navigate back after deletion
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting pet: $e')),
+          );
+        }
+      }
+    }
   }
 } 

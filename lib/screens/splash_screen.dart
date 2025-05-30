@@ -39,7 +39,10 @@ class _SplashScreenState extends State<SplashScreen> {
             Navigator.pushReplacementNamed(
               context,
               AppRouter.dashboard,
-              arguments: {'pets': pets},
+              arguments: {
+                'pets': pets,
+                'petService': petService,
+              },
             );
           } catch (e) {
             if (!mounted) return;
