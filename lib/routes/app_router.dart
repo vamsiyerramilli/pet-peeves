@@ -7,6 +7,7 @@ import 'package:pet_peeves/screens/timeline/timeline_screen.dart';
 import 'package:pet_peeves/screens/splash_screen.dart';
 import 'package:pet_peeves/models/pet.dart';
 import 'package:pet_peeves/services/pet_service.dart';
+import 'package:pet_peeves/screens/main_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -56,7 +57,7 @@ class AppRouter {
           );
         }
         return MaterialPageRoute(
-          builder: (_) => DashboardScreen(pets: pets),
+          builder: (_) => MainScreen(pets: pets),
         );
       case petProfile:
         // Extract pet and petService from arguments if provided
