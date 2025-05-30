@@ -161,6 +161,8 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
               _buildHealthMetrics(),
               const SizedBox(height: 24),
               _buildFoodDetails(),
+              const SizedBox(height: 24),
+              _buildVaccinationDetails(),
             ],
           ),
         ),
@@ -220,12 +222,23 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
             _buildInfoRow(
               'Species',
               _isEditing
-                  ? TextFormField(
-                      controller: _speciesController,
+                  ? DropdownButtonFormField<String>(
+                      value: _speciesController.text,
                       decoration: const InputDecoration(
                         labelText: 'Species',
                         border: OutlineInputBorder(),
                       ),
+                      items: ['Dog', 'Cat', 'Bird', 'Other'] // Assuming these are the species options
+                          .map((species) => DropdownMenuItem(
+                                value: species,
+                                child: Text(species),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          _speciesController.text = value; // Update controller text
+                        }
+                      },
                       validator: (value) =>
                           value?.isEmpty ?? true ? 'Species is required' : null,
                     )
@@ -268,6 +281,10 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                             ? DateFormat('MMM d, y').format(_dateOfBirth!)
                             : 'Not set',
                       ),
+                      // Ensure TextButton is enabled
+                      style: TextButton.styleFrom(
+                        foregroundColor: _isEditing ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface,
+                      ),
                     )
                   : Text(
                       widget.pet.dateOfBirth != null
@@ -275,33 +292,34 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                           : 'Not set',
                     ),
             ),
-            if (widget.pet.adoptionDate != null)
-              _buildInfoRow(
-                'Adoption Date',
-                _isEditing
-                    ? TextButton(
-                        onPressed: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: _adoptionDate ?? DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime.now(),
-                          );
-                          if (date != null) {
-                            setState(() => _adoptionDate = date);
-                          }
-                        },
-                        child: Text(
-                          _adoptionDate != null
-                              ? DateFormat('MMM d, y').format(_adoptionDate!)
-                              : 'Not set',
-                        ),
-                      )
-                    : Text(
-                        DateFormat('MMM d, y')
-                            .format(widget.pet.adoptionDate!),
+            // Adoption Date (always show)
+            _buildInfoRow(
+              'Adoption Date',
+              _isEditing
+                  ? TextButton(
+                      onPressed: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _adoptionDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                        );
+                        if (date != null) {
+                          setState(() => _adoptionDate = date);
+                        }
+                      },
+                      child: Text(
+                        _adoptionDate != null
+                            ? DateFormat('MMM d, y').format(_adoptionDate!)
+                            : 'Not set',
                       ),
-              ),
+                    )
+                  : Text(
+                        widget.pet.adoptionDate != null
+                            ? DateFormat('MMM d, y').format(widget.pet.adoptionDate!)
+                            : 'Not set',
+                      ),
+            ),
           ],
         ),
       ),
@@ -379,6 +397,106 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
 
   Widget _buildFoodDetails() {
     return const SizedBox.shrink(); // Hide this section for now
+  }
+
+  // Add a new section for Vaccination Details
+  Widget _buildVaccinationDetails() {
+    // Helper to find the earliest upcoming vaccination date
+    DateTime? _getEarliestUpcomingVaccinationDate(List<PetVaccination>? vaccinations) {
+        if (vaccinations == null || vaccinations.isEmpty) {
+            return null;
+        }
+
+        final now = DateTime.now();
+        DateTime? earliestDate;
+
+        for (final vaccination in vaccinations) {
+            if (vaccination.nextDueDate != null && vaccination.nextDueDate!.isAfter(now)) {
+                if (earliestDate == null || vaccination.nextDueDate!.isBefore(earliestDate)) {
+                    earliestDate = vaccination.nextDueDate;
+                }
+            }
+        }
+        return earliestDate;
+    }
+
+    // Helper to determine vaccination status
+    String _getVaccinationStatus(List<PetVaccination>? vaccinations) {
+      if (vaccinations == null || vaccinations.isEmpty) {
+        return 'No vaccinations recorded';
+      }
+
+      final now = DateTime.now();
+      bool hasUpcoming = false;
+      bool hasOverdue = false;
+
+      for (final vaccination in vaccinations) {
+        if (vaccination.nextDueDate != null) {
+          if (vaccination.nextDueDate!.isAfter(now)) {
+            hasUpcoming = true;
+          } else {
+            hasOverdue = true;
+          }
+        }
+      }
+
+      if (hasUpcoming) {
+        // Find the earliest upcoming date to refine the status
+        final earliestUpcoming = _getEarliestUpcomingVaccinationDate(vaccinations);
+        if (earliestUpcoming != null) {
+          final difference = earliestUpcoming.difference(now).inDays;
+          if (difference <= 60) { // Consider 'soon' if within 60 days
+             return 'Vaccination due soon';
+          } else {
+            return 'Vaccinated';
+          }
+        } else {
+           // Should not happen if hasUpcoming is true, but as a fallback:
+           return 'Vaccinated';
+        }
+      } else if (hasOverdue) {
+        return 'Vaccinations overdue';
+      } else {
+        // All vaccinations have null or past nextDueDate, but the list is not empty
+        return 'Vaccinated'; // Assume completed if no upcoming/overdue dates
+      }
+    }
+
+    final vaccinationStatus = _getVaccinationStatus(widget.pet.vaccinations);
+    final earliestUpcomingDate = _getEarliestUpcomingVaccinationDate(widget.pet.vaccinations);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Vaccinations',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            if (_isEditing) // Show add/edit options when editing
+              // TODO: Implement UI for adding/editing vaccinations
+              Center(
+                child: Text('Vaccination editing UI goes here'),
+              )
+            else // Display summary when not editing
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoRow('Status', Text(vaccinationStatus)),
+                  if (earliestUpcomingDate != null)
+                    _buildInfoRow(
+                      'Next Due',
+                      Text(DateFormat('MMM d, y').format(earliestUpcomingDate)),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildInfoRow(String label, Widget value) {
