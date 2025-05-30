@@ -33,9 +33,9 @@ class Pet {
     return {
       'name': name,
       'species': species,
-      'dateOfBirth': dateOfBirth,
+      'dateOfBirth': dateOfBirth != null ? Timestamp.fromDate(dateOfBirth!) : null,
       'gender': gender,
-      'adoptionDate': adoptionDate,
+      'adoptionDate': adoptionDate != null ? Timestamp.fromDate(adoptionDate!) : null,
       'photoURL': photoURL,
       'measurements': measurements?.toMap(),
       'foods': foods?.map((f) => f.toMap()).toList(),
