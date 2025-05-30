@@ -292,35 +292,34 @@ class _PetProfileScreenState extends State<PetProfileScreen> {
                           : 'Not set',
                     ),
             ),
-            // Adoption Date (always show in edit mode)
-            if (_isEditing || widget.pet.adoptionDate != null)
-              _buildInfoRow(
-                'Adoption Date',
-                _isEditing
-                    ? TextButton(
-                        onPressed: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: _adoptionDate ?? DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime.now(),
-                          );
-                          if (date != null) {
-                            setState(() => _adoptionDate = date);
-                          }
-                        },
-                        child: Text(
-                          _adoptionDate != null
-                              ? DateFormat('MMM d, y').format(_adoptionDate!)
-                              : 'Not set',
-                        ),
-                      )
-                    : Text(
+            // Adoption Date (always show)
+            _buildInfoRow(
+              'Adoption Date',
+              _isEditing
+                  ? TextButton(
+                      onPressed: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _adoptionDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                        );
+                        if (date != null) {
+                          setState(() => _adoptionDate = date);
+                        }
+                      },
+                      child: Text(
+                        _adoptionDate != null
+                            ? DateFormat('MMM d, y').format(_adoptionDate!)
+                            : 'Not set',
+                      ),
+                    )
+                  : Text(
                         widget.pet.adoptionDate != null
                             ? DateFormat('MMM d, y').format(widget.pet.adoptionDate!)
                             : 'Not set',
                       ),
-              ),
+            ),
           ],
         ),
       ),
