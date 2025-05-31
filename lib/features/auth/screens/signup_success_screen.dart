@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../models/user_model.dart';
+import '../../pets/screens/pet_onboarding_screen.dart';
 
 class SignupSuccessScreen extends StatelessWidget {
   final UserModel user;
@@ -46,10 +47,12 @@ class SignupSuccessScreen extends StatelessWidget {
               // Continue Button
               ElevatedButton(
                 onPressed: () {
-                  // TODO: Navigate to onboarding or home screen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Onboarding screen coming soon!'),
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PetOnboardingScreen(
+                        userId: user.uid,
+                      ),
                     ),
                   );
                 },

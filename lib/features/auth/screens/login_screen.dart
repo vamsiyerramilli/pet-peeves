@@ -17,14 +17,14 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  Future<void> _handleGoogleSignIn() async {
+  Future<void> _handleSignIn() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final UserModel? user = await _authService.signInWithGoogle();
+      final UserModel? user = await _authService.signInWithFirebase();
       if (user != null && mounted) {
         // Navigate to success screen
         Navigator.of(context).pushReplacement(
@@ -79,9 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 48),
 
-              // Google Sign In Button
+              // Sign In Button
               ElevatedButton.icon(
-                onPressed: _isLoading ? null : _handleGoogleSignIn,
+                onPressed: _isLoading ? null : _handleSignIn,
                 style: AppTheme.primaryButtonStyle,
                 icon: SvgPicture.asset(
                   'assets/google_logo.svg',
@@ -96,13 +96,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Error Message
               if (_errorMessage != null)
-                Text(
-                  _errorMessage!,
-                  style: const TextStyle(
-                    color: AppTheme.errorColor,
-                    fontSize: 14,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.errorColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: AppTheme.errorColor,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
 
               // Terms and Privacy

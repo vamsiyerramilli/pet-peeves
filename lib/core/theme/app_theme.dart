@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static final colors = AppColors();
+
   // Colors
   static const Color charcoalBlack = Color(0xFF36454F);
   static const Color primaryColor = Color(0xFF4A90E2); // Example primary color
@@ -64,4 +66,17 @@ class AppTheme {
       ),
     );
   }
-} 
+}
+
+class AppColors {
+  final primary = const Color(0xFF6200EE);
+  final secondary = const Color(0xFF03DAC6);
+  final background = const Color(0xFFF5F5F5);
+  final surface = Colors.white;
+  final error = const Color(0xFFB00020);
+  final onPrimary = Colors.white;
+  final onSecondary = Colors.black;
+  final onBackground = Colors.black;
+  final onSurface = Colors.black;
+  final onError = Colors.white;
+}

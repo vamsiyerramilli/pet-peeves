@@ -44,31 +44,30 @@ Use the below colour scheme for all the different UI elements. Whenever in quest
 1. User downloads the app
 2. User opens the app for the first time
 3. [Signup and Login Journey](https://www.notion.so/Signup-and-Login-Journey-204e040ad299806d8b4dd7f72f7f5d79?pvs=21) 
-4. User onboarding & Profile
-5. Pet onboarding & Profile
-6. App landing screen
+4. Pet onboarding & Profile
+5. App landing screen
     1. Bottom navigation
     2. Top navigation
     3. Home page navigation
     4. Floating action button
-7. Food Tracking
+6. Food Tracking
     1. Adding a new entry
     2. Editing an entry
     3. Deleting an entry
     4. Page layout and actions
-8. Measurement Tracking
+7. Measurement Tracking
     1. Adding a new entry
     2. Editing an entry
     3. Deleting an entry
     4. Page layout and actions
-9. Health Tracking
+8. Health Tracking
     1. Adding a new entry
     2. Editing an entry
     3. Deleting an entry
     4. Page layout and actions
-10. Home page
-11. Timeline views
-12. Trends and Charts
+9. Home page
+10. Timeline views
+11. Trends and Charts
 
 # PRDs
 

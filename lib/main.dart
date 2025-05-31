@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'features/auth/screens/login_screen.dart';
+import 'features/pets/screens/pet_onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -36,6 +40,34 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const LoginScreen(),
+    );
+  }
+}
+
+class TestScreen extends StatelessWidget {
+  const TestScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Test Screen'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PetOnboardingScreen(
+                  userId: 'test_user', // For testing purposes
+                ),
+              ),
+            );
+          },
+          child: const Text('Start Pet Onboarding'),
+        ),
+      ),
     );
   }
 }
