@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>316973893429-5hue0cs6jimo6tbfpmv98v61bcafb8sc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.316973893429-5hue0cs6jimo6tbfpmv98v61bcafb8sc</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCi91uM-zXviKTkmG08KyYNG5MnaGWk6zA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>316973893429</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.petPeevesys</string>
+	<key>PROJECT_ID</key>
+	<string>pet-peeves-ys</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pet-peeves-ys.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:316973893429:ios:c82442b4d5c8b9cfc6ee7c</string>
+</dict>
+</plist>
