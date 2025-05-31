@@ -212,22 +212,22 @@ class _PetOnboardingScreenState extends State<PetOnboardingScreen> {
 
       case OnboardingStep.measurements:
         return MeasurementsStep(
-          onWeightChanged: (value) => setState(() => _weight = value),
-          onLengthChanged: (value) => setState(() => _length = value),
-          onHeightChanged: (value) => setState(() => _height = value),
-          onNotesChanged: (value) => setState(() => _measurementNotes = value),
           initialWeight: _weight,
           initialLength: _length,
           initialHeight: _height,
-          initialNotes: _measurementNotes,
+          onWeightChanged: (value) => setState(() => _weight = value),
+          onLengthChanged: (value) => setState(() => _length = value),
+          onHeightChanged: (value) => setState(() => _height = value),
+          onSkip: () => _nextStep(),
         );
 
       case OnboardingStep.healthInfo:
         return HealthInfoStep(
-          onVaccinationStatusChanged: (value) => setState(() => _vaccinationStatus = value),
-          onNotesChanged: (value) => setState(() => _healthNotes = value),
           initialVaccinationStatus: _vaccinationStatus,
           initialNotes: _healthNotes,
+          onVaccinationStatusChanged: (value) => setState(() => _vaccinationStatus = value),
+          onNotesChanged: (value) => setState(() => _healthNotes = value),
+          onSkip: () => _nextStep(),
         );
 
       case OnboardingStep.review:

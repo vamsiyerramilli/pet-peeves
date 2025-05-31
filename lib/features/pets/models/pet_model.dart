@@ -1,7 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum Gender { male, female, preferNotToSay, unsure }
-enum Species { cat, dog, bird, fish, other }
+enum Gender {
+  male('Male'),
+  female('Female'),
+  preferNotToSay('Prefer not to say'),
+  unsure('Unsure');
+
+  final String displayName;
+  const Gender(this.displayName);
+}
+
+enum Species {
+  dog('Dog'),
+  cat('Cat'),
+  bird('Bird'),
+  fish('Fish'),
+  other('Other');
+
+  final String displayName;
+  const Species(this.displayName);
+}
 
 class PetModel {
   final String id;
