@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static final colors = AppColors();
+  static final colors = _AppColors();
+
+  static final lightTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: colors.primary,
+      background: colors.background,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: colors.background,
+      elevation: 0,
+      centerTitle: false,
+      iconTheme: IconThemeData(color: colors.primary),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: colors.primary,
+      unselectedItemColor: colors.secondary,
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: colors.primary,
+      foregroundColor: Colors.white,
+    ),
+  );
 
   // Colors
   static const Color charcoalBlack = Color(0xFF36454F);
@@ -68,15 +90,10 @@ class AppTheme {
   }
 }
 
-class AppColors {
-  final primary = const Color(0xFF6200EE);
-  final secondary = const Color(0xFF03DAC6);
+class _AppColors {
+  final primary = const Color(0xFF2196F3);
+  final secondary = const Color(0xFF757575);
   final background = const Color(0xFFF5F5F5);
-  final surface = Colors.white;
-  final error = const Color(0xFFB00020);
-  final onPrimary = Colors.white;
-  final onSecondary = Colors.black;
-  final onBackground = Colors.black;
-  final onSurface = Colors.black;
-  final onError = Colors.white;
+  final error = const Color(0xFFD32F2F);
+  final success = const Color(0xFF4CAF50);
 }

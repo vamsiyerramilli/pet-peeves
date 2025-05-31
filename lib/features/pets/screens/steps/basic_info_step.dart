@@ -141,10 +141,16 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             labelText: 'Species',
             hintText: 'Select your pet\'s species',
           ),
-          items: Species.values.map((species) {
+          items: [
+            Species.dog,
+            Species.cat,
+            Species.bird,
+            Species.fish,
+            Species.other,
+          ].map((species) {
             return DropdownMenuItem(
               value: species,
-              child: Text(species.toString().split('.').last.toUpperCase()),
+              child: Text(species.displayName),
             );
           }).toList(),
           onChanged: widget.onSpeciesChanged,
@@ -180,7 +186,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           items: Gender.values.map((gender) {
             return DropdownMenuItem(
               value: gender,
-              child: Text(gender.toString().split('.').last.toUpperCase()),
+              child: Text(gender.displayName),
             );
           }).toList(),
           onChanged: widget.onGenderChanged,
@@ -192,7 +198,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           title: const Text('Date of Birth'),
           subtitle: Text(
             widget.initialDateOfBirth != null
-                ? '${widget.initialDateOfBirth!.day}/${widget.initialDateOfBirth!.month}/${widget.initialDateOfBirth!.year}'
+                ? _formatDate(widget.initialDateOfBirth!)
                 : 'Not set',
           ),
           trailing: const Icon(Icons.calendar_today),
@@ -215,7 +221,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           title: const Text('Adoption Date'),
           subtitle: Text(
             widget.initialAdoptionDate != null
-                ? '${widget.initialAdoptionDate!.day}/${widget.initialAdoptionDate!.month}/${widget.initialAdoptionDate!.year}'
+                ? _formatDate(widget.initialAdoptionDate!)
                 : 'Not set',
           ),
           trailing: const Icon(Icons.calendar_today),
@@ -233,5 +239,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         ),
       ],
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]} ${date.year}';
   }
 } 

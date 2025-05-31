@@ -39,11 +39,14 @@ class AuthService {
       
       if (!userDoc.exists) {
         // Create new user in Firestore
+        final now = DateTime.now();
         final newUser = UserModel(
           uid: user.uid,
           name: user.displayName ?? '',
           email: user.email ?? '',
-          profilePicURL: user.photoURL,
+          profilePhotoUrl: user.photoURL,
+          createdAt: now,
+          updatedAt: now,
         );
         
         await _firestore.collection('users').doc(user.uid).set(newUser.toMap());

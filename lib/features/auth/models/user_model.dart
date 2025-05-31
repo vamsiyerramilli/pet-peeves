@@ -4,28 +4,28 @@ class UserModel {
   final String uid;
   final String name;
   final String email;
-  final String? profilePicURL;
-  final bool onboardingComplete;
-  final List<String> pets;
+  final String? profilePhotoUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   UserModel({
     required this.uid,
     required this.name,
     required this.email,
-    this.profilePicURL,
-    this.onboardingComplete = false,
-    this.pets = const [],
+    this.profilePhotoUrl,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>;
     return UserModel(
       uid: doc.id,
-      name: data['name'] ?? '',
-      email: data['email'] ?? '',
-      profilePicURL: data['profilePicURL'],
-      onboardingComplete: data['onboardingComplete'] ?? false,
-      pets: List<String>.from(data['pets'] ?? []),
+      name: data['name'] as String,
+      email: data['email'] as String,
+      profilePhotoUrl: data['profilePhotoUrl'] as String?,
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
   }
 
@@ -33,26 +33,24 @@ class UserModel {
     return {
       'name': name,
       'email': email,
-      'profilePicURL': profilePicURL,
-      'onboardingComplete': onboardingComplete,
-      'pets': pets,
+      'profilePhotoUrl': profilePhotoUrl,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
   UserModel copyWith({
     String? name,
     String? email,
-    String? profilePicURL,
-    bool? onboardingComplete,
-    List<String>? pets,
+    String? profilePhotoUrl,
   }) {
     return UserModel(
-      uid: this.uid,
+      uid: uid,
       name: name ?? this.name,
       email: email ?? this.email,
-      profilePicURL: profilePicURL ?? this.profilePicURL,
-      onboardingComplete: onboardingComplete ?? this.onboardingComplete,
-      pets: pets ?? this.pets,
+      profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
+      createdAt: createdAt,
+      updatedAt: DateTime.now(),
     );
   }
 } 

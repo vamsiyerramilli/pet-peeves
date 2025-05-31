@@ -3,13 +3,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import '../../../core/store/app_state.dart';
 
-class HomeScreen extends StatelessWidget {
-  final String? userId;
-
-  const HomeScreen({
-    super.key,
-    this.userId,
-  });
+class LogsScreen extends StatelessWidget {
+  const LogsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +17,14 @@ class HomeScreen extends StatelessWidget {
           );
         }
 
+        if (vm.activePetId == null) {
+          return const Center(
+            child: Text('Select a pet to view logs'),
+          );
+        }
+
         return const Center(
-          child: Text('Home Screen - Coming Soon'),
+          child: Text('Logs Screen - Coming Soon'),
         );
       },
     );

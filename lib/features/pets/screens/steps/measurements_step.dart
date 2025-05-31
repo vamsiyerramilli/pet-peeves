@@ -6,23 +6,21 @@ class MeasurementsStep extends StatefulWidget {
   final Function(double?) onWeightChanged;
   final Function(double?) onLengthChanged;
   final Function(double?) onHeightChanged;
-  final Function(String?) onNotesChanged;
+  final VoidCallback onSkip;
 
   final double? initialWeight;
   final double? initialLength;
   final double? initialHeight;
-  final String? initialNotes;
 
   const MeasurementsStep({
     super.key,
     required this.onWeightChanged,
     required this.onLengthChanged,
     required this.onHeightChanged,
-    required this.onNotesChanged,
+    required this.onSkip,
     this.initialWeight,
     this.initialLength,
     this.initialHeight,
-    this.initialNotes,
   });
 
   @override
@@ -33,7 +31,6 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
   final _weightController = TextEditingController();
   final _lengthController = TextEditingController();
   final _heightController = TextEditingController();
-  final _notesController = TextEditingController();
 
   @override
   void initState() {
@@ -41,7 +38,6 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
     _weightController.text = widget.initialWeight?.toString() ?? '';
     _lengthController.text = widget.initialLength?.toString() ?? '';
     _heightController.text = widget.initialHeight?.toString() ?? '';
-    _notesController.text = widget.initialNotes ?? '';
   }
 
   @override
@@ -49,7 +45,6 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
     _weightController.dispose();
     _lengthController.dispose();
     _heightController.dispose();
-    _notesController.dispose();
     super.dispose();
   }
 
@@ -62,8 +57,8 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
         TextFormField(
           controller: _weightController,
           decoration: const InputDecoration(
-            labelText: 'Weight',
-            hintText: 'Enter weight in kg',
+            labelText: 'Weight (in kg)',
+            hintText: 'Enter weight',
             suffixText: 'kg',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -82,8 +77,8 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
         TextFormField(
           controller: _lengthController,
           decoration: const InputDecoration(
-            labelText: 'Length',
-            hintText: 'Enter length in cm',
+            labelText: 'Length (in cm)',
+            hintText: 'Enter length',
             suffixText: 'cm',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -102,8 +97,8 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
         TextFormField(
           controller: _heightController,
           decoration: const InputDecoration(
-            labelText: 'Height',
-            hintText: 'Enter height in cm',
+            labelText: 'Height (in cm)',
+            hintText: 'Enter height',
             suffixText: 'cm',
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -116,17 +111,12 @@ class _MeasurementsStepState extends State<MeasurementsStep> {
             );
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
-        // Notes
-        TextFormField(
-          controller: _notesController,
-          decoration: const InputDecoration(
-            labelText: 'Notes',
-            hintText: 'Add any additional notes about the measurements',
-          ),
-          maxLines: 3,
-          onChanged: widget.onNotesChanged,
+        // Skip button
+        TextButton(
+          onPressed: widget.onSkip,
+          child: const Text('Skip Measurements'),
         ),
         const SizedBox(height: 24),
 

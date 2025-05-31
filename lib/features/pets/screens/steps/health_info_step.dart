@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 class HealthInfoStep extends StatefulWidget {
   final Function(VaccinationStatus?) onVaccinationStatusChanged;
   final Function(String?) onNotesChanged;
+  final VoidCallback onSkip;
 
   final VaccinationStatus? initialVaccinationStatus;
   final String? initialNotes;
@@ -13,6 +14,7 @@ class HealthInfoStep extends StatefulWidget {
     super.key,
     required this.onVaccinationStatusChanged,
     required this.onNotesChanged,
+    required this.onSkip,
     this.initialVaccinationStatus,
     this.initialNotes,
   });
@@ -108,6 +110,13 @@ class _HealthInfoStepState extends State<HealthInfoStep> {
               ],
             ),
           ),
+        ),
+        const SizedBox(height: 24),
+
+        // Skip button
+        TextButton(
+          onPressed: widget.onSkip,
+          child: const Text('Skip Health Information'),
         ),
         const SizedBox(height: 24),
 
