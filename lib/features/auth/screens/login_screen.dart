@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import '../../../core/theme/app_theme.dart';
 import '../services/auth_service.dart';
-import '../models/user_model.dart';
-import 'signup_success_screen.dart';
+import '../../../core/store/actions.dart';
+import '../../../core/store/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,25 +19,28 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
 
   Future<void> _handleSignIn() async {
+    final store = StoreProvider.of<AppState>(context, listen: false);
+    
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
+    // Dispatch loading action to Redux
+    store.dispatch(SignInAction(isLoading: true));
+
     try {
-      final UserModel? user = await _authService.signInWithFirebase();
-      if (user != null && mounted) {
-        // Navigate to success screen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => SignupSuccessScreen(user: user),
-          ),
-        );
-      }
+      // Just perform the Firebase sign in
+      // The auth state listener in main.dart will handle updating Redux
+      await _authService.signInWithFirebase();
+      
+      // No manual navigation - let Redux state changes handle it
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
       });
+      // Dispatch error to Redux
+      store.dispatch(SignInFailureAction(e.toString()));
     } finally {
       if (mounted) {
         setState(() {
@@ -99,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.errorColor.withOpacity(0.1),
+                    color: AppTheme.errorColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

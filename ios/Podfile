@@ -4,6 +4,14 @@ platform :ios, '13.0'
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
+# Prevent Xcode 14+ from sending SIGSTOP signals to CocoaPods scripts
+ENV['DISABLE_COCOAPODS_DEINTEGRATE'] = 'true'
+
+pre_install do |installer|
+  # Workaround for Xcode 16 and gRPC
+  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+end
+
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
@@ -28,16 +36,69 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
-  use_frameworks!
+  # Build all pods statically by default.  This avoids CocoaPods embedding
+  # dynamic frameworks that contain absolute symlinks which iOS rejects.
+  use_frameworks! :linkage => :static
+  use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
 end
 
 post_install do |installer|
+  # Flutter-specific post-installation tweaks
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    target.build_configurations.each do |config|
+      # Ensure minimum deployment target
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+
+      # General build settings
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+
+      # Fix for Xcode 15
+      config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+      config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+
+      # Fix for Firebase binary distribution
+      if ['FirebaseFirestore', 'FirebaseAuth', 'FirebaseCore', 'FirebaseStorage', 'FirebaseCoreInternal'].include?(target.name)
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+
+      # Fix for gRPC-Core and abseil
+      if ['gRPC-Core', 'abseil'].include?(target.name)
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'GPR_GRPC_VALIDATE_CHANNEL_ARGS=0']
+      end
+
+      # Disable code signing for simulator builds
+      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ''
+      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY_NAME'] = ''
+
+      # Additional Flutter settings
+      config.build_settings['STRIP_STYLE'] = 'non-global'
+    end
+  end
+
+  # Remove "-G" flag from generated xcconfig files (Xcode 15 workaround)
+  Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig") do |config_file|
+    lines = File.readlines(config_file)
+    modified = false
+    lines.map! do |line|
+      if line.include?('-G')
+        modified = true
+        line.gsub('-G', '')
+      else
+        line
+      end
+    end
+    File.write(config_file, lines.join) if modified
   end
 end

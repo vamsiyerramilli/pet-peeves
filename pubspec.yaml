@@ -34,15 +34,15 @@ dependencies:
     sdk: flutter
 
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  firebase_storage: ^11.5.6
+  firebase_core: ^3.13.1
+  firebase_auth: ^5.5.4
+  cloud_firestore: ^5.6.8
+  firebase_storage: ^12.4.6
   provider: ^6.1.1
   image_picker: ^1.0.5
-  intl: ^0.18.1
+  intl: 0.20.2
   uuid: ^4.2.2
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
 
   # State Management
   flutter_redux: ^0.10.0
@@ -52,8 +52,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.0
-  flutter_form_builder: ^9.1.1
-  form_builder_validators: ^9.1.0
+  flutter_form_builder: ^10.0.1
+  form_builder_validators: ^11.1.2
 
   # Utilities
   logger: ^2.0.2+1
@@ -69,9 +69,9 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.7
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

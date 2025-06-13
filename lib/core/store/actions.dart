@@ -1,4 +1,35 @@
 import 'app_state.dart';
+import '../../features/auth/models/user_model.dart';
+
+// Auth Actions
+class SignInAction {
+  final bool isLoading;
+  SignInAction({this.isLoading = true});
+}
+
+class SignInSuccessAction {
+  final UserModel user;
+  SignInSuccessAction(this.user);
+}
+
+class SignInFailureAction {
+  final String error;
+  SignInFailureAction(this.error);
+}
+
+class SignOutAction {}
+
+class SignOutSuccessAction {}
+
+class SignOutFailureAction {
+  final String error;
+  SignOutFailureAction(this.error);
+}
+
+class UpdateUserAction {
+  final UserModel user;
+  UpdateUserAction(this.user);
+}
 
 // Navigation Actions
 class SetActiveTabAction {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/health_log_model.dart';
+import '../../food/widgets/food_entry_modal.dart';
 
 class AddLogScreen extends StatelessWidget {
   final String petId;
@@ -44,8 +45,17 @@ class AddLogScreen extends StatelessWidget {
             leading: const Icon(Icons.restaurant),
             title: const Text('Food Log'),
             onTap: () {
-              // TODO: Navigate to food log form
               Navigator.pop(context);
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: FoodEntryModal(petId: petId),
+                ),
+              );
             },
           ),
           ListTile(

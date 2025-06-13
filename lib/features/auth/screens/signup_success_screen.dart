@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import '../../../core/store/app_state.dart';
+import '../../../core/store/actions.dart';
+import '../../../core/theme/app_theme.dart';
 import '../models/user_model.dart';
 import '../../pets/screens/pet_onboarding_screen.dart';
 import '../../pets/screens/home_screen.dart';
@@ -31,16 +33,8 @@ class _SignupSuccessScreenState extends State<SignupSuccessScreen> {
     if (!mounted) return;
 
     // Check if user has pets
-    final petsSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.user.uid)
-        .collection('pets')
-        .limit(1)
-        .get();
-
-    if (!mounted) return;
-
-    if (petsSnapshot.docs.isEmpty) {
+    final store = StoreProvider.of<AppState>(context);
+    if (store.state.pets.petIds.isEmpty) {
       // No pets, go to onboarding
       Navigator.pushReplacement(
         context,
@@ -53,7 +47,7 @@ class _SignupSuccessScreenState extends State<SignupSuccessScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(userId: widget.user.uid),
+          builder: (context) => const HomeScreen(),
         ),
       );
     }

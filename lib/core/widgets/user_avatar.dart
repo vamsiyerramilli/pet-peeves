@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../features/auth/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserAvatar extends StatelessWidget {
   final VoidCallback onTap;
@@ -12,8 +12,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = AuthService();
-    final currentUser = authService.currentUser;
+    final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
       return const SizedBox.shrink();
