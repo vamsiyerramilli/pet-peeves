@@ -83,6 +83,7 @@ class FoodTrackingScreen extends StatelessWidget {
   }
 
   void _showEntryModal(BuildContext context, [FoodTrackingEntry? existingEntry]) {
+    print('SHOW_ENTRY_MODAL: called with entry: ' + (existingEntry?.id ?? 'null'));
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -188,6 +189,7 @@ class _FoodEntryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('FOOD_ENTRY_LIST_ITEM: build for entry: ' + entry.id);
     return ListTile(
       title: Row(
         children: [
@@ -221,7 +223,10 @@ class _FoodEntryListItem extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: onEdit,
+            onPressed: () {
+              print('EDIT_ICON: pressed for entry: ' + entry.id);
+              onEdit();
+            },
           ),
           IconButton(
             icon: const Icon(Icons.delete),

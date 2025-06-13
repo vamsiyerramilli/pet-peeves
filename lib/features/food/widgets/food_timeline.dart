@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/store/app_state.dart';
 import '../models/food_tracking_entry.dart';
 import '../store/food_tracking_actions.dart';
+import '../widgets/food_entry_modal.dart';
 
 class FoodTimeline extends StatefulWidget {
   final String petId;
@@ -62,7 +63,7 @@ class _FoodTimelineState extends State<FoodTimeline> {
           );
         }
       },
-      converter: (store) => _ViewModel.fromStore(store, widget.petId),
+      converter: (store) => _ViewModel.fromStore(store, widget.petId, context),
       builder: (context, vm) {
         Widget content;
 
@@ -364,13 +365,22 @@ class _ViewModel {
     required this.isPendingSync,
   });
 
-  static _ViewModel fromStore(Store<AppState> store, String petId) {
+  static _ViewModel fromStore(Store<AppState> store, String petId, BuildContext context) {
     return _ViewModel(
       entries: store.state.foodTracking.getEntriesForPet(petId),
       isLoading: store.state.foodTracking.isLoading,
       error: store.state.foodTracking.error,
       onRetry: () => store.dispatch(LoadFoodTrackingEntries(petId)),
-      onEditEntry: (entry) => store.dispatch(UpdateFoodTrackingEntry(petId, entry)),
+      onEditEntry: (entry) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => FoodEntryModal(
+            petId: petId,
+            entry: entry,
+          ),
+        );
+      },
       onDeleteEntry: (entryId) => store.dispatch(DeleteFoodTrackingEntry(petId, entryId)),
       isPendingSync: (entryId) => store.state.foodTracking.isEntryPending(petId, entryId),
     );

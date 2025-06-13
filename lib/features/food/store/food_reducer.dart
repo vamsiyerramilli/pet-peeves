@@ -13,6 +13,7 @@ FoodState foodReducer(FoodState state, dynamic action) {
   }
 
   if (action is LoadFoodsSuccessAction) {
+    print('FOOD_REDUCER: foods loaded: ' + action.foods.length.toString());
     return state.copyWith(
       isLoading: false,
       foods: action.foods,
@@ -29,6 +30,7 @@ FoodState foodReducer(FoodState state, dynamic action) {
 
   // Add food
   if (action is AddFoodAction) {
+    print('FOOD_REDUCER: AddFoodAction for food: \\${action.food.name}');
     if (action.optimistic) {
       final foods = List<Food>.from(state.foods)..add(action.food);
       return state.copyWith(
@@ -43,6 +45,7 @@ FoodState foodReducer(FoodState state, dynamic action) {
   }
 
   if (action is AddFoodSuccessAction) {
+    print('FOOD_REDUCER: AddFoodSuccessAction for food: \\${action.food.name}');
     if (!action.wasOptimistic) {
       final foods = List<Food>.from(state.foods)..add(action.food);
       return state.copyWith(
@@ -55,6 +58,7 @@ FoodState foodReducer(FoodState state, dynamic action) {
   }
 
   if (action is AddFoodFailureAction) {
+    print('FOOD_REDUCER: AddFoodFailureAction: \\${action.error}');
     if (action.wasOptimistic) {
       final foods = List<Food>.from(state.foods)
         ..removeWhere((f) => f.id == action.food.id);

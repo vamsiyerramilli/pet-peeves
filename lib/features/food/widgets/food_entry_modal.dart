@@ -156,6 +156,7 @@ class _FoodEntryModalState extends State<FoodEntryModal> {
   }
 
   void _saveEntry(_ViewModel vm) async {
+    print('FOOD_MODAL: Save button pressed, entering _saveEntry');
     if (_formKey.currentState!.validate()) {
       final weight = double.parse(_weightController.text);
       
@@ -181,13 +182,21 @@ class _FoodEntryModalState extends State<FoodEntryModal> {
               : null,
           createdAt: DateTime.now(),
         );
+        print('FOOD_MODAL: Dispatching onAddFood for food: \\${food.name}');
         vm.onAddFood(food);
+
+        // Reload foods list from Firestore after adding new food
+        final store = StoreProvider.of<AppState>(context, listen: false);
+        final userId = store.state.auth.userId;
+        if (userId != null) {
+          store.dispatch(LoadFoodsAction(userId));
+        }
 
         // Wait for the food to be added before proceeding
         if (vm.error != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error adding food: ${vm.error}'),
+              content: Text('Error adding food: \\${vm.error}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -226,6 +235,7 @@ class _FoodEntryModalState extends State<FoodEntryModal> {
 
   @override
   Widget build(BuildContext context) {
+    print('FOOD_MODAL: build() called');
     return StoreConnector<AppState, _ViewModel>(
       converter: (store) => _ViewModel.fromStore(store, widget.petId),
       onWillChange: (_ViewModel? prev, _ViewModel next) {
@@ -244,6 +254,16 @@ class _FoodEntryModalState extends State<FoodEntryModal> {
         }
       },
       builder: (context, vm) {
+        // Ensure _selectedFood is set when editing an entry
+        if (_selectedFood == null && widget.entry != null) {
+          try {
+            final match = vm.foods.firstWhere((f) => f.id == widget.entry!.foodId);
+            _selectedFood = match;
+            _isAddingNewFood = false;
+          } catch (_) {
+            // No matching food found; leave as is
+          }
+        }
         return Scaffold(
           appBar: AppBar(
             title: Text(widget.entry == null ? 'Add Food Entry' : 'Edit Food Entry'),
@@ -264,7 +284,10 @@ class _FoodEntryModalState extends State<FoodEntryModal> {
                 )
               else
                 TextButton(
-                  onPressed: () => _saveEntry(vm),
+                  onPressed: () {
+                    print('FOOD_MODAL: Save button onPressed called');
+                    _saveEntry(vm);
+                  },
                   child: const Text('Save'),
                 ),
             ],

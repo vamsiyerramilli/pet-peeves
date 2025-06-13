@@ -28,9 +28,11 @@ Middleware<AppState> _loadFoods(FoodService service) {
 
     try {
       final userId = store.state.auth.userId;
+      print('FOOD_MW: Loading foods for userId: ' + userId.toString());
       if (userId == null) throw Exception('User not authenticated');
 
       final foods = await service.getFoods(userId);
+      print('FOOD_MW: Loaded ' + foods.length.toString() + ' foods from Firestore');
       store.dispatch(LoadFoodsSuccessAction(foods));
     } catch (e) {
       store.dispatch(LoadFoodsFailureAction(e.toString()));
@@ -42,6 +44,7 @@ Middleware<AppState> _addFood(FoodService service) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) async {
     if (action is! AddFoodAction) return next(action);
 
+    print('FOOD_MW: AddFoodAction dispatched for food: \\${action.food.name}');
     next(action);
 
     try {
@@ -49,13 +52,18 @@ Middleware<AppState> _addFood(FoodService service) {
       if (userId == null) throw Exception('User not authenticated');
 
       if (action.optimistic) {
+        print('FOOD_MW: Optimistic add, calling service.addFood');
         final food = await service.addFood(userId, action.food);
+        print('FOOD_MW: AddFoodSuccessAction (optimistic) for food: \\${food.name}');
         store.dispatch(AddFoodSuccessAction(food, wasOptimistic: true));
       } else {
+        print('FOOD_MW: Non-optimistic add, calling service.addFood');
         final food = await service.addFood(userId, action.food);
+        print('FOOD_MW: AddFoodSuccessAction for food: \\${food.name}');
         store.dispatch(AddFoodSuccessAction(food));
       }
     } catch (e) {
+      print('FOOD_MW: AddFoodFailureAction: \\${e.toString()}');
       store.dispatch(AddFoodFailureAction(e.toString(), action.food));
     }
   };

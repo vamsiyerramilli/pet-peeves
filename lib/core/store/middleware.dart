@@ -5,6 +5,7 @@ import 'actions.dart';
 import '../../features/food/store/food_middleware.dart';
 import '../../features/food/store/food_tracking_middleware.dart';
 import '../../features/food/services/food_service.dart';
+import '../../features/food/store/food_actions.dart';
 
 List<Middleware<AppState>> createMiddleware() {
   final firestore = FirebaseFirestore.instance;
@@ -40,11 +41,13 @@ void _loadPets(Store<AppState> store, LoadPetsAction action, NextDispatcher next
 }
 
 void _handleUserUpdate(Store<AppState> store, UpdateUserAction action, NextDispatcher next) {
+  print('HANDLE_USER_UPDATE: called for user ' + action.user.uid);
   next(action);
 
   // If we have a valid user ID we can fetch their pets immediately
   final uid = action.user.uid;
   if (uid.isNotEmpty) {
     store.dispatch(LoadPetsAction(uid));
+    store.dispatch(LoadFoodsAction(uid)); // Load foods on auth success
   }
 } 

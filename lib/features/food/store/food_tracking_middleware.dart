@@ -52,7 +52,7 @@ Middleware<AppState> _addFoodEntry(FoodService foodService) {
       next(action);
 
       if (action.optimistic) {
-        store.dispatch(AddFoodEntrySuccessAction(action.entry, wasOptimistic: true));
+        // Do nothing, let the reducer handle the optimistic update.
         return;
       }
 

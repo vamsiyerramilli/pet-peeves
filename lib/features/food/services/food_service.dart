@@ -72,14 +72,15 @@ class FoodService {
   }
 
   Future<FoodTrackingEntry> addFoodTrackingEntry(String userId, FoodTrackingEntry entry) async {
-    final docRef = await _firestore
+    await _firestore
         .collection('users')
         .doc(userId)
         .collection('pets')
         .doc(entry.petId)
         .collection('food_entries')
-        .add(entry.toFirestore());
-    return entry.copyWith(id: docRef.id);
+        .doc(entry.id)
+        .set(entry.toFirestore());
+    return entry;
   }
 
   Future<FoodTrackingEntry> updateFoodTrackingEntry(String userId, FoodTrackingEntry entry) async {

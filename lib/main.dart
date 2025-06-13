@@ -60,6 +60,7 @@ void _initializeAuthState(Store<AppState> store) {
         
         // Set user in auth state (stops loading)
         store.dispatch(SignInSuccessAction(userModel));
+        store.dispatch(UpdateUserAction(userModel));
         
         // Load pets separately
         store.dispatch(LoadPetsAction(userModel.uid));
