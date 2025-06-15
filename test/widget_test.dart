@@ -7,13 +7,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:redux/redux.dart';
 
 import 'package:pet_peeves/main.dart';
+import 'package:pet_peeves/core/store/app_state.dart';
+import 'package:pet_peeves/core/store/reducers.dart';
+import 'package:pet_peeves/core/store/middleware.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    final store = Store<AppState>(
+      appReducer,
+      initialState: AppState.initial(),
+      middleware: createMiddleware(),
+    );
+
+    await tester.pumpWidget(MyApp(store: store));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

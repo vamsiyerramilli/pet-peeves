@@ -54,10 +54,14 @@ class AuthService {
       }
 
       return UserModel.fromFirestore(userDoc);
-    } on FirebaseAuthException catch (e) {
-      throw _handleFirebaseAuthError(e);
-    } catch (e) {
-      throw 'An unexpected error occurred. Please try again.';
+    } on FirebaseAuthException catch (e, stack) {
+      print('FIREBASE AUTH ERROR: $e');
+      print(stack);
+      rethrow;
+    } catch (e, stack) {
+      print('GENERIC ERROR: $e');
+      print(stack);
+      rethrow;
     }
   }
 

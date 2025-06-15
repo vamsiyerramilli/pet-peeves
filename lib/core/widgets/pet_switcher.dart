@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../features/pets/models/pet_model.dart';
-import '../../features/auth/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PetSwitcher extends StatelessWidget {
   final List<String> petIds;
@@ -21,8 +21,7 @@ class PetSwitcher extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final authService = AuthService();
-    final currentUser = authService.currentUser;
+    final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
       return const SizedBox.shrink();

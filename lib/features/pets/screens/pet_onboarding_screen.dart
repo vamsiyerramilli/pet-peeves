@@ -97,9 +97,8 @@ class _PetOnboardingScreenState extends State<PetOnboardingScreen> {
   }
 
   void _previousStep() {
-    if (_currentStep == OnboardingStep.basicInfo) {
-      Navigator.pop(context);
-    } else {
+    // Only allow going back between steps, not exiting onboarding
+    if (_currentStep != OnboardingStep.basicInfo) {
       setState(() {
         _currentStep = OnboardingStep.values[_currentStep.index - 1];
       });
@@ -110,10 +109,11 @@ class _PetOnboardingScreenState extends State<PetOnboardingScreen> {
   bool _validateCurrentStep() {
     switch (_currentStep) {
       case OnboardingStep.basicInfo:
-        return _name.isNotEmpty && _species != Species.other || 
-               (_species == Species.other && _otherSpecies != null);
+        return _name.isNotEmpty && 
+               (_species != Species.other || 
+                (_species == Species.other && _otherSpecies != null && _otherSpecies!.isNotEmpty));
       case OnboardingStep.measurements:
-        return _weight != null || _length != null || _height != null;
+        return true; // All measurements are optional
       case OnboardingStep.healthInfo:
         return true; // All fields are optional
       case OnboardingStep.review:
@@ -254,10 +254,13 @@ class _PetOnboardingScreenState extends State<PetOnboardingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_stepTitle),
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.back),
-          onPressed: _isLoading ? null : _previousStep,
-        ),
+        leading: _currentStep == OnboardingStep.basicInfo 
+          ? null // No back button on first step
+          : IconButton(
+              icon: const Icon(CupertinoIcons.back),
+              onPressed: _isLoading ? null : _previousStep,
+            ),
+        automaticallyImplyLeading: _currentStep != OnboardingStep.basicInfo,
       ),
       body: Stack(
         children: [
@@ -317,22 +320,23 @@ class _PetOnboardingScreenState extends State<PetOnboardingScreen> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _isLoading ? null : _previousStep,
-                  child: Text(
-                    _currentStep == OnboardingStep.basicInfo ? 'Cancel' : 'Back',
+              // Only show back button if not on first step
+              if (_currentStep != OnboardingStep.basicInfo) ...[
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _isLoading ? null : _previousStep,
+                    child: const Text('Back'),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
+                const SizedBox(width: 16),
+              ],
               Expanded(
                 child: FilledButton(
                   onPressed: _isLoading || !_validateCurrentStep()
                       ? null
                       : _nextStep,
                   child: Text(
-                    _currentStep == OnboardingStep.review ? 'Create' : 'Next',
+                    _currentStep == OnboardingStep.review ? 'Create Pet' : 'Next',
                   ),
                 ),
               ),

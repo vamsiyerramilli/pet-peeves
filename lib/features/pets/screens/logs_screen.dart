@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import '../../../core/store/app_state.dart';
+import '../../food/widgets/food_timeline.dart';
 
 class LogsScreen extends StatelessWidget {
   const LogsScreen({super.key});
@@ -23,8 +24,33 @@ class LogsScreen extends StatelessWidget {
           );
         }
 
-        return const Center(
-          child: Text('Logs Screen - Coming Soon'),
+        return DefaultTabController(
+          length: 4,
+          child: Column(
+            children: [
+              TabBar(
+                isScrollable: true,
+                tabs: const [
+                  Tab(text: 'Food'),
+                  Tab(text: 'Health'),
+                  Tab(text: 'Measurements'),
+                  Tab(text: 'Activity'),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    // Food Timeline
+                    FoodTimeline(petId: vm.activePetId!),
+                    // Other logs - Coming soon
+                    const Center(child: Text('Health Logs - Coming Soon')),
+                    const Center(child: Text('Measurements - Coming Soon')),
+                    const Center(child: Text('Activity Logs - Coming Soon')),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

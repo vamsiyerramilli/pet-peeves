@@ -2,10 +2,24 @@ import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'app_state.dart';
 import 'actions.dart';
+import '../../features/food/store/food_middleware.dart';
+import '../../features/food/store/food_tracking_middleware.dart';
+import '../../features/food/services/food_service.dart';
+import '../../features/food/store/food_actions.dart';
 
 List<Middleware<AppState>> createMiddleware() {
+  final firestore = FirebaseFirestore.instance;
+  final foodService = FoodService(firestore);
+
   return [
+    // Ensure pets still load after authentication
     TypedMiddleware<AppState, LoadPetsAction>(_loadPets),
+
+    // When the user object is stored in Redux, kick off pet loading
+    TypedMiddleware<AppState, UpdateUserAction>(_handleUserUpdate),
+
+    ...createFoodMiddleware(foodService),
+    ...createFoodTrackingMiddleware(foodService),
   ];
 }
 
@@ -20,13 +34,20 @@ void _loadPets(Store<AppState> store, LoadPetsAction action, NextDispatcher next
         .get();
 
     final petIds = snapshot.docs.map((doc) => doc.id).toList();
-    store.dispatch(SetPetIdsAction(petIds));
-    
-    // Set first pet as active if none is selected
-    if (petIds.isNotEmpty && store.state.pets.activePetId == null) {
-      store.dispatch(SetActivePetAction(petIds.first));
-    }
+    store.dispatch(LoadPetsSuccessAction(petIds));
   } catch (e) {
     store.dispatch(LoadPetsFailureAction(e.toString()));
+  }
+}
+
+void _handleUserUpdate(Store<AppState> store, UpdateUserAction action, NextDispatcher next) {
+  print('HANDLE_USER_UPDATE: called for user ' + action.user.uid);
+  next(action);
+
+  // If we have a valid user ID we can fetch their pets immediately
+  final uid = action.user.uid;
+  if (uid.isNotEmpty) {
+    store.dispatch(LoadPetsAction(uid));
+    store.dispatch(LoadFoodsAction(uid)); // Load foods on auth success
   }
 } 

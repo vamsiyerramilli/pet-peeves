@@ -8,7 +8,7 @@ class UserModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  UserModel({
+  const UserModel({
     required this.uid,
     required this.name,
     required this.email,
@@ -21,11 +21,11 @@ class UserModel {
     final data = doc.data() as Map<String, dynamic>;
     return UserModel(
       uid: doc.id,
-      name: data['name'] as String,
-      email: data['email'] as String,
+      name: data['name'] as String? ?? '',
+      email: data['email'] as String? ?? '',
       profilePhotoUrl: data['profilePhotoUrl'] as String?,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
@@ -40,17 +40,20 @@ class UserModel {
   }
 
   UserModel copyWith({
+    String? uid,
     String? name,
     String? email,
     String? profilePhotoUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return UserModel(
-      uid: uid,
+      uid: uid ?? this.uid,
       name: name ?? this.name,
       email: email ?? this.email,
       profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
-      createdAt: createdAt,
-      updatedAt: DateTime.now(),
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 } 
