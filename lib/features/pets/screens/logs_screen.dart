@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import '../../../core/store/app_state.dart';
 import '../../food/widgets/food_timeline.dart';
+import '../../measurements/widgets/measurement_timeline.dart';
 
 class LogsScreen extends StatelessWidget {
   const LogsScreen({super.key});
@@ -44,7 +45,8 @@ class LogsScreen extends StatelessWidget {
                     FoodTimeline(petId: vm.activePetId!),
                     // Other logs - Coming soon
                     const Center(child: Text('Health Logs - Coming Soon')),
-                    const Center(child: Text('Measurements - Coming Soon')),
+                    // Measurements Timeline
+                    MeasurementTimeline(petId: vm.activePetId!),
                     const Center(child: Text('Activity Logs - Coming Soon')),
                   ],
                 ),

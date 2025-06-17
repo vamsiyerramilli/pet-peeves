@@ -25,42 +25,89 @@ class MeasurementState {
     );
   }
 
-  // Helper methods for filtering entries
-  List<MeasurementEntry> getWeightEntries() {
+  // Get entries for a specific pet, sorted by timestamp (newest first)
+  List<MeasurementEntry> getEntriesForPet(String petId) {
     return entries
-        .where((e) => e.weightKg != null)
+        .where((entry) => entry.petId == petId)
         .toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
-  List<MeasurementEntry> getHeightEntries() {
+  // Get entries for a specific pet within a date range
+  List<MeasurementEntry> getEntriesForPetInDateRange(
+    String petId,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     return entries
-        .where((e) => e.heightCm != null)
+        .where((entry) =>
+            entry.petId == petId &&
+            entry.timestamp.isAfter(startDate) &&
+            entry.timestamp.isBefore(endDate))
         .toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
-  List<MeasurementEntry> getLengthEntries() {
+  // Helper methods for filtering entries by type
+  List<MeasurementEntry> getWeightEntries(String petId) {
     return entries
-        .where((e) => e.lengthCm != null)
+        .where((e) => e.petId == petId && e.weightKg != null)
         .toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
-  // Get latest measurements
-  MeasurementEntry? getLatestWeightEntry() {
-    final weightEntries = getWeightEntries();
+  List<MeasurementEntry> getHeightEntries(String petId) {
+    return entries
+        .where((e) => e.petId == petId && e.heightCm != null)
+        .toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
+  List<MeasurementEntry> getLengthEntries(String petId) {
+    return entries
+        .where((e) => e.petId == petId && e.lengthCm != null)
+        .toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
+  // Get latest measurements for a pet
+  MeasurementEntry? getLatestWeightEntry(String petId) {
+    final weightEntries = getWeightEntries(petId);
     return weightEntries.isNotEmpty ? weightEntries.first : null;
   }
 
-  MeasurementEntry? getLatestHeightEntry() {
-    final heightEntries = getHeightEntries();
+  MeasurementEntry? getLatestHeightEntry(String petId) {
+    final heightEntries = getHeightEntries(petId);
     return heightEntries.isNotEmpty ? heightEntries.first : null;
   }
 
-  MeasurementEntry? getLatestLengthEntry() {
-    final lengthEntries = getLengthEntries();
+  MeasurementEntry? getLatestLengthEntry(String petId) {
+    final lengthEntries = getLengthEntries(petId);
     return lengthEntries.isNotEmpty ? lengthEntries.first : null;
+  }
+
+  // Validation helper methods
+  static bool isValidWeight(double? weight) {
+    if (weight == null) return true;
+    return weight > 0 && weight <= 1000;
+  }
+
+  static bool isValidHeight(double? height) {
+    if (height == null) return true;
+    return height > 0 && height <= 10000;
+  }
+
+  static bool isValidLength(double? length) {
+    if (length == null) return true;
+    return length > 0 && length <= 10000;
+  }
+
+  static bool hasAtLeastOneMeasurement(
+    double? weight,
+    double? height,
+    double? length,
+  ) {
+    return weight != null || height != null || length != null;
   }
 
   MeasurementState copyWith({
