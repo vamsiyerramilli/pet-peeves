@@ -6,10 +6,14 @@ import '../../features/food/store/food_middleware.dart';
 import '../../features/food/store/food_tracking_middleware.dart';
 import '../../features/food/services/food_service.dart';
 import '../../features/food/store/food_actions.dart';
+import '../../features/measurements/store/measurement_middleware.dart';
+import '../../features/measurements/services/measurement_service.dart';
+import '../../features/measurements/store/measurement_actions.dart';
 
 List<Middleware<AppState>> createMiddleware() {
   final firestore = FirebaseFirestore.instance;
   final foodService = FoodService(firestore);
+  final measurementService = MeasurementService(firestore);
 
   return [
     // Ensure pets still load after authentication
@@ -20,6 +24,7 @@ List<Middleware<AppState>> createMiddleware() {
 
     ...createFoodMiddleware(foodService),
     ...createFoodTrackingMiddleware(foodService),
+    ...createMeasurementMiddleware(measurementService),
   ];
 }
 
@@ -49,5 +54,6 @@ void _handleUserUpdate(Store<AppState> store, UpdateUserAction action, NextDispa
   if (uid.isNotEmpty) {
     store.dispatch(LoadPetsAction(uid));
     store.dispatch(LoadFoodsAction(uid)); // Load foods on auth success
+    store.dispatch(LoadMeasurementsAction(uid)); // Load measurements on auth success
   }
 } 

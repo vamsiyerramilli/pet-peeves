@@ -3,6 +3,7 @@ import 'app_state.dart';
 import 'actions.dart';
 import '../../features/food/store/food_tracking_reducer.dart';
 import '../../features/food/store/food_reducer.dart';
+import '../../features/measurements/store/measurement_reducer.dart';
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -11,8 +12,26 @@ AppState appReducer(AppState state, dynamic action) {
     pets: petsReducer(state.pets, action),
     food: foodReducer(state.food, action),
     foodTracking: foodTrackingReducer(state.foodTracking, action),
+    measurements: measurementReducer(state.measurements, action), // Add this if needed
   );
 }
+// AppState _measurementReducer(AppState state, dynamic action) {
+//   return state.copyWith(
+//     measurements: measurementReducer(state.measurements, action),
+//   );
+// }
+
+// AppState _foodReducer(AppState state, dynamic action) {
+//   return state.copyWith(
+//     food: foodReducer(state.food, action),
+//   );
+// }
+
+// AppState _foodTrackingReducer(AppState state, dynamic action) {
+//   return state.copyWith(
+//     foodTracking: foodTrackingReducer(state.foodTracking, action),
+//   );
+// }
 
 AuthState authReducer(AuthState state, dynamic action) {
   if (action is SignInAction) {
