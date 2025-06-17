@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../../features/food/store/food_state.dart';
 import '../../features/food/store/food_tracking_state.dart';
 import '../../features/auth/models/user_model.dart';
+import '../../features/measurements/store/measurement_state.dart';
 
 enum AppTab {
   home,
@@ -18,6 +19,7 @@ class AppState {
   final PetsState pets;
   final FoodState food;
   final FoodTrackingState foodTracking;
+  final MeasurementState measurements;
 
   const AppState({
     required this.navigation,
@@ -25,6 +27,7 @@ class AppState {
     required this.pets,
     required this.food,
     required this.foodTracking,
+    required this.measurements,
   });
 
   factory AppState.initial() {
@@ -34,6 +37,7 @@ class AppState {
       pets: PetsState.initial(),
       food: FoodState.initial(),
       foodTracking: FoodTrackingState.initial(),
+      measurements: MeasurementState.initial(),
     );
   }
 
@@ -43,6 +47,7 @@ class AppState {
     PetsState? pets,
     FoodState? food,
     FoodTrackingState? foodTracking,
+    MeasurementState? measurements,
   }) {
     return AppState(
       navigation: navigation ?? this.navigation,
@@ -50,6 +55,7 @@ class AppState {
       pets: pets ?? this.pets,
       food: food ?? this.food,
       foodTracking: foodTracking ?? this.foodTracking,
+      measurements: measurements ?? this.measurements,
     );
   }
 
@@ -61,7 +67,8 @@ class AppState {
         other.auth == auth &&
         other.pets == pets &&
         other.food == food &&
-        other.foodTracking == foodTracking;
+        other.foodTracking == foodTracking &&
+        other.measurements == measurements;
   }
 
   @override
@@ -72,6 +79,7 @@ class AppState {
       pets,
       food,
       foodTracking,
+      measurements,
     );
   }
 }
