@@ -1,5 +1,6 @@
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'app_state.dart';
 import 'actions.dart';
 import '../../features/food/store/food_middleware.dart';
@@ -9,11 +10,15 @@ import '../../features/food/store/food_actions.dart';
 import '../../features/measurements/store/measurement_middleware.dart';
 import '../../features/measurements/services/measurement_service.dart';
 import '../../features/measurements/store/measurement_actions.dart';
+import '../../features/health/store/health_middleware.dart';
+import '../../features/health/services/health_service.dart';
 
 List<Middleware<AppState>> createMiddleware() {
   final firestore = FirebaseFirestore.instance;
+  final storage = FirebaseStorage.instance;
   final foodService = FoodService(firestore);
   final measurementService = MeasurementService(firestore);
+  final healthService = HealthService(firestore, storage);
 
   return [
     // Ensure pets still load after authentication
@@ -25,6 +30,7 @@ List<Middleware<AppState>> createMiddleware() {
     ...createFoodMiddleware(foodService),
     ...createFoodTrackingMiddleware(foodService),
     ...createMeasurementMiddleware(measurementService),
+    ...createHealthMiddleware(healthService),
   ];
 }
 

@@ -5,6 +5,7 @@ import '../../features/food/store/food_state.dart';
 import '../../features/food/store/food_tracking_state.dart';
 import '../../features/auth/models/user_model.dart';
 import '../../features/measurements/store/measurement_state.dart';
+import '../../features/health/store/health_state.dart';
 
 enum AppTab {
   home,
@@ -20,6 +21,7 @@ class AppState {
   final FoodState food;
   final FoodTrackingState foodTracking;
   final MeasurementState measurements;
+  final HealthState health;
 
   const AppState({
     required this.navigation,
@@ -28,6 +30,7 @@ class AppState {
     required this.food,
     required this.foodTracking,
     required this.measurements,
+    required this.health,
   });
 
   factory AppState.initial() {
@@ -38,6 +41,7 @@ class AppState {
       food: FoodState.initial(),
       foodTracking: FoodTrackingState.initial(),
       measurements: MeasurementState.initial(),
+      health: HealthState.initial(),
     );
   }
 
@@ -48,6 +52,7 @@ class AppState {
     FoodState? food,
     FoodTrackingState? foodTracking,
     MeasurementState? measurements,
+    HealthState? health,
   }) {
     return AppState(
       navigation: navigation ?? this.navigation,
@@ -56,6 +61,7 @@ class AppState {
       food: food ?? this.food,
       foodTracking: foodTracking ?? this.foodTracking,
       measurements: measurements ?? this.measurements,
+      health: health ?? this.health,
     );
   }
 
@@ -68,7 +74,8 @@ class AppState {
         other.pets == pets &&
         other.food == food &&
         other.foodTracking == foodTracking &&
-        other.measurements == measurements;
+        other.measurements == measurements &&
+        other.health == health;
   }
 
   @override
@@ -80,6 +87,7 @@ class AppState {
       food,
       foodTracking,
       measurements,
+      health,
     );
   }
 }

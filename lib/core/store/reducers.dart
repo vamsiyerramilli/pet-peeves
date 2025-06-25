@@ -4,6 +4,7 @@ import 'actions.dart';
 import '../../features/food/store/food_tracking_reducer.dart';
 import '../../features/food/store/food_reducer.dart';
 import '../../features/measurements/store/measurement_reducer.dart';
+import '../../features/health/store/health_reducer.dart';
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -12,7 +13,8 @@ AppState appReducer(AppState state, dynamic action) {
     pets: petsReducer(state.pets, action),
     food: foodReducer(state.food, action),
     foodTracking: foodTrackingReducer(state.foodTracking, action),
-    measurements: measurementReducer(state.measurements, action), // Add this if needed
+    measurements: measurementReducer(state.measurements, action),
+    health: healthReducer(state.health, action),
   );
 }
 // AppState _measurementReducer(AppState state, dynamic action) {
